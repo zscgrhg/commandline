@@ -99,7 +99,9 @@ public abstract class Excutable<R> {
         if (null != err) {
             pb.redirectError(err);
         } else {
-            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            if(!pb.redirectErrorStream()){
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            }
         }
         Process process = pb.start();
         Handler<R> handler = createHandler(process);
