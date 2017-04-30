@@ -50,7 +50,6 @@ public abstract class Excutable<R> {
         if (null != workDir && workDir.exists() && workDir.isDirectory()) {
             pb.directory(workDir);
         }
-
         return pb;
     }
 
@@ -59,47 +58,37 @@ public abstract class Excutable<R> {
     }
 
     public R excute(List<String> args) throws Exception {
-        ProcessBuilder pb = createProcessBuilder(args);
-        initProcessBuilder(pb);
-        pb.inheritIO();
-        Process process = pb.start();
-        Handler<R> handler = createHandler(process);
-        handler.onStart();
-        try {
-            waitUntilProcessExit(process);
-        } finally {
-            killIfAlive(process);
-            handler.onComplete(process.exitValue());
-        }
-        return handler.get();
+        return excuteAndRedirectToFiles(null,null,null,args);
     }
 
     public R excute(File out, String... args) throws Exception {
-        return excute(null, out, null, Arrays.asList(args));
+        return excuteAndRedirectToFiles(null, out, null, Arrays.asList(args));
     }
 
-    public R excute(File in, File out, File err, String... args) throws Exception {
-        return excute(in, out, err, Arrays.asList(args));
+    public R excuteAndRedirectToFiles(File in, File out, File err, String... args) throws Exception {
+        return excuteAndRedirectToFiles(in, out, err, Arrays.asList(args));
     }
 
-    public R excute(File in, File out, File err, List<String> args) throws Exception {
+    public R excuteAndRedirectToFiles(File in, File out, File err, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
 
         initProcessBuilder(pb);
         if (null != in) {
             pb.redirectInput(in);
-        } else {
-            pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
         }
+
         if (null != out) {
             pb.redirectOutput(out);
         } else {
-            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            if (ProcessBuilder.Redirect.PIPE.equals(pb.redirectOutput())) {
+                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            }
         }
         if (null != err) {
             pb.redirectError(err);
         } else {
-            if(!pb.redirectErrorStream()){
+            if (!pb.redirectErrorStream() &&
+                    (ProcessBuilder.Redirect.PIPE.equals(pb.redirectError()))) {
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
             }
         }
