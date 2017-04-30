@@ -21,8 +21,8 @@ public class Commands extends Excutable<Integer> {
         return workDir;
     }
 
-    public ExitValueHandler createHandler(Process process) {
-        return new PwHandler();
+    public SimpleHandler createHandler(Process process) {
+        return new SimpleHandler();
     }
 
     protected Charset charset() {
@@ -34,7 +34,7 @@ public class Commands extends Excutable<Integer> {
     public static void main(String[] args) throws Exception {
 
         Commands commands = new Commands();
-        Integer ping = commands.excute( "ping","www.qq.com");
-        System.out.println(ping);
+        Integer ping = commands.getResult("echo","www.qq.com");
+        System.out.println(">>"+ping);
     }
 }

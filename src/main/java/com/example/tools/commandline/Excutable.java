@@ -33,27 +33,93 @@ public abstract class Excutable<R> {
     protected void waitUntilProcessExit(Process process) throws Exception {
         process.waitFor();
     }
-    protected File getWorkDir(){
+
+    protected File getWorkDir() {
         return null;
     }
-    protected Process createProcess(String... args) throws IOException {
-       return createProcess(Arrays.asList(args));
+
+    protected void initProcessBuilder(ProcessBuilder pb) throws IOException {
+        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
     }
-    protected Process createProcess(List<String> args) throws IOException {
+
+    protected ProcessBuilder createProcessBuilder(List<String> args) throws IOException {
         List<String> cmds = new ArrayList<String>();
         cmds.addAll(getCommandLines(args));
         ProcessBuilder pb = new ProcessBuilder(cmds);
         File workDir = getWorkDir();
-        if(null!= workDir&&workDir.exists()&&workDir.isDirectory()){
+        if (null != workDir && workDir.exists() && workDir.isDirectory()) {
             pb.directory(workDir);
         }
-        return pb.start();
+
+        return pb;
     }
-    public R excute(List<String> args) throws Exception{
-        Process process = createProcess(args);
-        process.getOutputStream().close();
-        InputStream errorStream = process.getErrorStream();
+
+    public R excute(String... args) throws Exception {
+        return excute(Arrays.asList(args));
+    }
+
+    public R excute(List<String> args) throws Exception {
+        ProcessBuilder pb = createProcessBuilder(args);
+        initProcessBuilder(pb);
+        pb.inheritIO();
+        Process process = pb.start();
         Handler<R> handler = createHandler(process);
+        handler.onStart();
+        try {
+            waitUntilProcessExit(process);
+        } finally {
+            killIfAlive(process);
+            handler.onComplete(process.exitValue());
+        }
+        return handler.get();
+    }
+
+    public R excute(File out, String... args) throws Exception {
+        return excute(null, out, null, Arrays.asList(args));
+    }
+
+    public R excute(File in, File out, File err, String... args) throws Exception {
+        return excute(in, out, err, Arrays.asList(args));
+    }
+
+    public R excute(File in, File out, File err, List<String> args) throws Exception {
+        ProcessBuilder pb = createProcessBuilder(args);
+
+        initProcessBuilder(pb);
+        if (null != in) {
+            pb.redirectInput(in);
+        } else {
+            pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
+        }
+        if (null != out) {
+            pb.redirectOutput(out);
+        } else {
+            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        }
+        if (null != err) {
+            pb.redirectError(err);
+        } else {
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+        }
+        Process process = pb.start();
+        Handler<R> handler = createHandler(process);
+        handler.onStart();
+        try {
+            waitUntilProcessExit(process);
+        } finally {
+            killIfAlive(process);
+            handler.onComplete(process.exitValue());
+        }
+        return handler.get();
+    }
+
+    public R getResult(List<String> args) throws Exception {
+        ProcessBuilder pb = createProcessBuilder(args);
+        initProcessBuilder(pb);
+        Process process = pb.start();
+        Handler<R> handler = createHandler(process);
+        handler.onStart();
+        InputStream errorStream = process.getErrorStream();
         ProcessReader stderrReader =
                 new ProcessReader(false, errorStream, stderrCharset(), handler);
         stderrReader.start();
@@ -71,10 +137,12 @@ public abstract class Excutable<R> {
         }
         return handler.get();
     }
-    public R excute(String... args) throws Exception {
 
-        return excute(Arrays.asList(args));
+    public R getResult(String... args) throws Exception {
+
+        return getResult(Arrays.asList(args));
     }
+
 
     public void killIfAlive(Process process) {
         try {

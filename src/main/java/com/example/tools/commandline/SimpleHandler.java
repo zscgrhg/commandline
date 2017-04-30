@@ -3,8 +3,13 @@ package com.example.tools.commandline;
 /**
  * Created by THINK on 2017/1/25.
  */
-public class ExitValueHandler implements Handler<Integer> {
+public class SimpleHandler implements Handler<Integer> {
     private volatile int exitValue = 0;
+
+    @Override
+    public void onStart() {
+
+    }
 
     public void onComplete(int procesExitValue) {
         exitValue = procesExitValue;
@@ -19,11 +24,11 @@ public class ExitValueHandler implements Handler<Integer> {
     }
 
     public void receiveError(String line) {
-        System.err.println(line);
+
     }
 
     public void receive(String line) {
-        System.out.println(line);
+
     }
 
     public Integer get() {

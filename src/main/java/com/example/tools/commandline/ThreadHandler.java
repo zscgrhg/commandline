@@ -6,13 +6,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by THINK on 2017/1/25.
  */
-public class HandlerThread<R> extends Thread implements Handler<R> {
+public class ThreadHandler<R> extends Thread implements Handler<R> {
 
     private final BlockingQueue<PMessage> queue;
     private final Handler<R> handler;
     private R r;
 
-    public HandlerThread(Handler<R> handler) {
+    public ThreadHandler(Handler<R> handler) {
 
         this.queue = new LinkedBlockingQueue<PMessage>();
         this.handler = handler;
@@ -80,6 +80,10 @@ public class HandlerThread<R> extends Thread implements Handler<R> {
         joins();
     }
 
+    @Override
+    public void onStart() {
+        puts(queue, new PMessage(PMessage.Key.START, null));
+    }
 
     public void onStderrEnd() {
         puts(queue, new PMessage(PMessage.Key.STDERR_END, null));

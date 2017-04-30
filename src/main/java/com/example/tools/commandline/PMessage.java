@@ -5,7 +5,7 @@ package com.example.tools.commandline;
  */
 public class PMessage {
     public enum Key {
-        STDERR, STDERR_END, STDOUT, STDOUT_END, FINISH
+        START,STDERR, STDERR_END, STDOUT, STDOUT_END, FINISH
     }
 
     public final Key key;

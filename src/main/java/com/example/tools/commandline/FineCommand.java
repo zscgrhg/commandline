@@ -6,9 +6,9 @@ package com.example.tools.commandline;
 public abstract class FineCommand<R> extends Excutable<R> {
     @Override
     public Handler<R> createHandler(Process process) {
-        HandlerThread<R> handlerThread = new HandlerThread<R>(fineHandler(process));
-        handlerThread.start();
-        return handlerThread;
+        ThreadHandler<R> threadHandler = new ThreadHandler<R>(fineHandler(process));
+        threadHandler.start();
+        return threadHandler;
     }
 
     protected abstract Handler<R> fineHandler(Process process);

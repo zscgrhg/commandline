@@ -5,6 +5,7 @@ package com.example.tools.commandline;
  */
 public interface Handler<R> {
 
+    void onStart();
     void onComplete(int processExitValue);
 
     void onStderrEnd();
