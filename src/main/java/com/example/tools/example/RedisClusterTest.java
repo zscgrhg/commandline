@@ -31,6 +31,6 @@ public class RedisClusterTest {
 
     public static void main(String[] args) throws Exception {
         stopCluster();
-        //startCluster();
+        startCluster();
     }
 }

@@ -14,7 +14,7 @@ public class ThreadHandler<R> extends Thread implements Handler<R> {
 
     public ThreadHandler(Handler<R> handler) {
 
-        this.queue = new LinkedBlockingQueue<PMessage>();
+        this.queue = new LinkedBlockingQueue<>();
         this.handler = handler;
     }
 
