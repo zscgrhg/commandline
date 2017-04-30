@@ -34,7 +34,7 @@ public class Commands extends Excutable<Integer> {
     public static void main(String[] args) throws Exception {
 
         Commands commands = new Commands();
-        Integer ping = commands.getResult("echo","www.qq.com");
+        Integer ping = commands.excuteAndRedirectToFiles(null,null,null,"ping","www.qq.com");
         System.out.println(">>"+ping);
     }
 }
