@@ -34,29 +34,29 @@ public  class Commands {
     }
 
     protected ProcessBuilder createProcessBuilder(List<String> args) throws IOException {
-        List<String> cmds = new ArrayList<String>();
+        List<String> cmds = new ArrayList<>();
         cmds.addAll(getCommandLines(args));
         ProcessBuilder pb = new ProcessBuilder(cmds);
         return pb;
     }
 
-    public int excuteIn(File workDir, String... args) throws Exception {
-        return excuteIn(workDir,Arrays.asList(args));
+    public int execute(File workDir, String... args) throws Exception {
+        return execute(workDir, Arrays.asList(args));
     }
 
-    public int excuteIn(File workDir, List<String> args) throws Exception {
-        return excuteInAndRedirectToFiles(workDir,null, null, null, args);
+    public int execute(File workDir, List<String> args) throws Exception {
+        return executeAndRedirects(workDir, null, null, null, args);
     }
 
-    public int excuteIn(File workDir, File out, String... args) throws Exception {
-        return excuteInAndRedirectToFiles(workDir,null, out, null, Arrays.asList(args));
+    public int execute(File workDir, File out, String... args) throws Exception {
+        return executeAndRedirects(workDir, null, out, null, Arrays.asList(args));
     }
 
-    public int excuteInAndRedirectToFiles(File workDir, File in, File out, File err, String... args) throws Exception {
-        return excuteInAndRedirectToFiles(workDir,in, out, err, Arrays.asList(args));
+    public int executeAndRedirects(File workDir, File in, File out, File err, String... args) throws Exception {
+        return executeAndRedirects(workDir, in, out, err, Arrays.asList(args));
     }
 
-    public int excuteInAndRedirectToFiles(File workDir, File in, File out, File err, List<String> args) throws Exception {
+    public int executeAndRedirects(File workDir, File in, File out, File err, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         if(workDir!=null){
             pb.directory(workDir);

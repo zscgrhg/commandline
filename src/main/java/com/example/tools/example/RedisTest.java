@@ -17,7 +17,7 @@ public class RedisTest {
     public static void startRedis() throws Exception {
         final Commands commands = new Commands();
         File clusterBasedir = new File("/root/IdeaProjects/commandline/redis");
-        commands.excuteIn(clusterBasedir,"/bin/bash","./shutdown.sh");
+        commands.execute(clusterBasedir, "/bin/bash", "./shutdown.sh");
 
 
         final Path conf = Paths.get("/root/IdeaProjects/commandline/src/main/resources/redis.conf");
@@ -42,7 +42,7 @@ public class RedisTest {
 
 
                 File log = file.toPath().resolve("redis.log").toFile();
-                commands.excuteIn(file, "ls");
+                commands.execute(file, "ls");
                 commands.excuteHandlerAsync(file, new RedisStartHandler(countDownLatch,log), "/home/think/test-redis/redis-3.2.8/src/redis-server", "./redis.conf");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -50,7 +50,7 @@ public class RedisTest {
         }
 
         countDownLatch.await();
-        commands.excuteInAndRedirectToFiles(clusterBasedir.toPath().resolve("7000").toFile(),
+        commands.executeAndRedirects(clusterBasedir.toPath().resolve("7000").toFile(),
                 clusterBasedir.toPath().resolve("yes.txt").toFile(),
                 null,
                 null, "/home/think/test-redis/redis-3.2.8/src/redis-trib.rb",
