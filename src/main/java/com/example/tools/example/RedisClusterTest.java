@@ -21,8 +21,6 @@ public class RedisClusterTest {
     }
 
     public static void startCluster() throws Exception {
-
-
         commands.execute(cluster_home,
                 redis_script_file.getCanonicalPath(), "start");
         commands.executeAndRedirects(cluster_home,

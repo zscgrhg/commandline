@@ -92,11 +92,14 @@ public  class Commands {
         return process.exitValue();
     }
 
-    public <R> R excuteHandler(File workDir, Handler<R> handler, List<String> args) throws Exception {
+    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
         if(workDir!=null){
             pb.directory(workDir);
+        }
+        if (null != null) {
+            pb.redirectInput(in);
         }
         Process process = pb.start();
         handler.onStart(process);
@@ -125,17 +128,24 @@ public  class Commands {
     }
 
     public <R> R excuteHandler(File workDir, Handler<R> handler, String... args) throws Exception {
-
-        return excuteHandler(workDir,handler,Arrays.asList(args));
+        return excuteHandler(workDir, null, handler, args);
     }
 
+    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, String... args) throws Exception {
+
+        return excuteHandler(workDir, in, handler, Arrays.asList(args));
+    }
 
     public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, final String... args) throws Exception {
+        return excuteHandlerAsync(workDir, null, handler, args);
+    }
+
+    public <R> Thread excuteHandlerAsync(final File workDir, final File in, final Handler<R> handler, final String... args) throws Exception {
         Thread t=new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    excuteHandler(workDir,handler,args);
+                    excuteHandler(workDir, in, handler, args);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
