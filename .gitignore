@@ -3,3 +3,4 @@ target/
 .idea/
 *.log
 redis/700*
+redis_cluster/
