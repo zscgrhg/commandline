@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by THINK on 2017/2/4.
  */
-public abstract class Excutable<R> {
+public abstract class Excutable {
     protected Charset stdoutCharset() {
         return charset();
     }
@@ -24,7 +24,7 @@ public abstract class Excutable<R> {
         return charset();
     }
 
-    public abstract Handler<R> createHandler(Process process);
+
 
     protected List<String> getCommandLines(List<String> args) {
         return args;
@@ -34,9 +34,7 @@ public abstract class Excutable<R> {
         process.waitFor();
     }
 
-    protected File getWorkDir() {
-        return null;
-    }
+
 
     protected void initProcessBuilder(ProcessBuilder pb) throws IOException {
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
@@ -46,32 +44,30 @@ public abstract class Excutable<R> {
         List<String> cmds = new ArrayList<String>();
         cmds.addAll(getCommandLines(args));
         ProcessBuilder pb = new ProcessBuilder(cmds);
-        File workDir = getWorkDir();
-        if (null != workDir && workDir.exists() && workDir.isDirectory()) {
-            pb.directory(workDir);
-        }
         return pb;
     }
 
-    public R excute(String... args) throws Exception {
-        return excute(Arrays.asList(args));
+    public int excuteIn(File workDir, String... args) throws Exception {
+        return excuteIn(workDir,Arrays.asList(args));
     }
 
-    public R excute(List<String> args) throws Exception {
-        return excuteAndRedirectToFiles(null, null, null, args);
+    public int excuteIn(File workDir, List<String> args) throws Exception {
+        return excuteInAndRedirectToFiles(workDir,null, null, null, args);
     }
 
-    public R excute(File out, String... args) throws Exception {
-        return excuteAndRedirectToFiles(null, out, null, Arrays.asList(args));
+    public int excuteIn(File workDir, File out, String... args) throws Exception {
+        return excuteInAndRedirectToFiles(workDir,null, out, null, Arrays.asList(args));
     }
 
-    public R excuteAndRedirectToFiles(File in, File out, File err, String... args) throws Exception {
-        return excuteAndRedirectToFiles(in, out, err, Arrays.asList(args));
+    public int excuteInAndRedirectToFiles(File workDir, File in, File out, File err, String... args) throws Exception {
+        return excuteInAndRedirectToFiles(workDir,in, out, err, Arrays.asList(args));
     }
 
-    public R excuteAndRedirectToFiles(File in, File out, File err, List<String> args) throws Exception {
+    public int excuteInAndRedirectToFiles(File workDir, File in, File out, File err, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
-
+        if(workDir!=null){
+            pb.directory(workDir);
+        }
         initProcessBuilder(pb);
         if (null != in) {
             pb.redirectInput(in);
@@ -93,23 +89,23 @@ public abstract class Excutable<R> {
             }
         }
         Process process = pb.start();
-        Handler<R> handler = createHandler(process);
-        handler.onStart();
+
         try {
             waitUntilProcessExit(process);
         } finally {
             killIfAlive(process);
-            handler.onComplete(process.exitValue());
         }
-        return handler.get();
+        return process.exitValue();
     }
 
-    public R getFineResult(List<String> args) throws Exception {
+    public <R> R excuteHandler(File workDir, Handler<R> handler, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
+        if(workDir!=null){
+            pb.directory(workDir);
+        }
         Process process = pb.start();
-        Handler<R> handler = createHandler(process);
-        handler.onStart();
+        handler.onStart(process);
         InputStream errorStream = process.getErrorStream();
         ProcessReader stderrReader =
                 new ProcessReader(false, errorStream, stderrCharset(), handler);
@@ -129,11 +125,26 @@ public abstract class Excutable<R> {
         return handler.get();
     }
 
-    public R getFineResult(String... args) throws Exception {
+    public <R> R excuteHandler(File workDir, Handler<R> handler, String... args) throws Exception {
 
-        return getFineResult(Arrays.asList(args));
+        return excuteHandler(workDir,handler,Arrays.asList(args));
     }
 
+
+    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, final String... args) throws Exception {
+        Thread t=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    excuteHandler(workDir,handler,args);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        t.start();
+        return t;
+    }
 
     public void killIfAlive(Process process) {
         try {

@@ -80,7 +80,7 @@ public class ThreadHandler<R> extends Thread implements Handler<R> {
     }
 
     @Override
-    public void onStart() {
+    public void onStart(Process process) {
         puts(queue, new PMessage(PMessage.Key.START, null));
     }
 
