@@ -18,6 +18,14 @@ public class ThreadHandler<R> extends Thread implements Handler<R> {
         this.handler = handler;
     }
 
+    private static <T> void puts(BlockingQueue<T> queue, T t) {
+        try {
+            queue.put(t);
+        } catch (InterruptedException e) {
+            puts(queue, t);
+            Thread.currentThread().interrupt();
+        }
+    }
 
     @Override
     public void run() {
@@ -54,15 +62,6 @@ public class ThreadHandler<R> extends Thread implements Handler<R> {
             }
         }
         publish(handler.get());
-    }
-
-    private static <T> void puts(BlockingQueue<T> queue, T t) {
-        try {
-            queue.put(t);
-        } catch (InterruptedException e) {
-            puts(queue, t);
-            Thread.currentThread().interrupt();
-        }
     }
 
     private void joins() {

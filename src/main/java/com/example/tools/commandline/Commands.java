@@ -9,11 +9,20 @@ import java.nio.charset.Charset;
 public class Commands extends Excutable<Integer> {
 
     private File workDir;
+
     public Commands() {
 
     }
+
     public Commands(File workDir) {
         this.workDir = workDir;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        Commands commands = new Commands();
+        Integer ping = commands.excuteAndRedirectToFiles(null, null, null, "ping", "www.qq.com");
+        System.out.println(">>" + ping);
     }
 
     @Override
@@ -27,14 +36,5 @@ public class Commands extends Excutable<Integer> {
 
     protected Charset charset() {
         return Charset.forName("UTF-8");
-    }
-
-
-
-    public static void main(String[] args) throws Exception {
-
-        Commands commands = new Commands();
-        Integer ping = commands.excuteAndRedirectToFiles(null,null,null,"ping","www.qq.com");
-        System.out.println(">>"+ping);
     }
 }

@@ -58,7 +58,7 @@ public abstract class Excutable<R> {
     }
 
     public R excute(List<String> args) throws Exception {
-        return excuteAndRedirectToFiles(null,null,null,args);
+        return excuteAndRedirectToFiles(null, null, null, args);
     }
 
     public R excute(File out, String... args) throws Exception {
@@ -104,7 +104,7 @@ public abstract class Excutable<R> {
         return handler.get();
     }
 
-    public R getResult(List<String> args) throws Exception {
+    public R getFineResult(List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
         Process process = pb.start();
@@ -129,9 +129,9 @@ public abstract class Excutable<R> {
         return handler.get();
     }
 
-    public R getResult(String... args) throws Exception {
+    public R getFineResult(String... args) throws Exception {
 
-        return getResult(Arrays.asList(args));
+        return getFineResult(Arrays.asList(args));
     }
 
 
