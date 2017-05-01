@@ -40,22 +40,31 @@ public class Commands {
     }
 
     public int execute(File workDir, String... args) throws Exception {
-        return execute(workDir, Arrays.asList(args));
+        return execute(workDir, args);
     }
 
     public int execute(File workDir, List<String> args) throws Exception {
-        return executeRedirectIO(workDir, null, null, null, args);
+        return executeRedirectIO(workDir, null, null, null, false, args);
     }
 
     public int execute(File workDir, File out, String... args) throws Exception {
-        return executeRedirectIO(workDir, null, out, null, Arrays.asList(args));
+        return executeRedirectIO(workDir, null, out, null, true, args);
+    }
+
+
+    public int executeRedirectIO(File workDir, File in, File out, String... args) throws Exception {
+        return executeRedirectIO(workDir, in, out, null, true, args);
     }
 
     public int executeRedirectIO(File workDir, File in, File out, File err, String... args) throws Exception {
-        return executeRedirectIO(workDir, in, out, err, Arrays.asList(args));
+        return executeRedirectIO(workDir, in, out, err, false, args);
     }
 
-    public int executeRedirectIO(File workDir, File in, File out, File err, List<String> args) throws Exception {
+    public int executeRedirectIO(File workDir, File in, File out, File err, boolean mergeErrorStream, String... args) throws Exception {
+        return executeRedirectIO(workDir, in, out, err, mergeErrorStream, Arrays.asList(args));
+    }
+
+    public int executeRedirectIO(File workDir, File in, File out, File err, boolean mergeErrorStream, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         if (workDir != null) {
             pb.directory(workDir);
@@ -76,6 +85,7 @@ public class Commands {
             pb.redirectErrorStream(false);
             pb.redirectError(err);
         } else {
+            pb.redirectErrorStream(mergeErrorStream);
             if (!pb.redirectErrorStream() &&
                     (ProcessBuilder.Redirect.PIPE.equals(pb.redirectError()))) {
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -91,13 +101,14 @@ public class Commands {
         return process.exitValue();
     }
 
-    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, List<String> args) throws Exception {
+    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, boolean redirectErrorStream, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
+        pb.redirectErrorStream(redirectErrorStream);
         if (workDir != null) {
             pb.directory(workDir);
         }
-        if (null != null) {
+        if (null != in) {
             pb.redirectInput(in);
         }
         Process process = pb.start();
@@ -126,21 +137,21 @@ public class Commands {
         return handler.get();
     }
 
-    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, String... args) throws Exception {
+    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, boolean mergeErrorStream, String... args) throws Exception {
 
-        return excuteHandler(workDir, in, handler, Arrays.asList(args));
+        return excuteHandler(workDir, in, handler, mergeErrorStream, Arrays.asList(args));
     }
 
-    public <R> R excuteHandler(File workDir, Handler<R> handler, String... args) throws Exception {
-        return excuteHandler(workDir, null, handler, args);
+    public <R> R excuteHandler(File workDir, boolean mergeErrorStream, Handler<R> handler, String... args) throws Exception {
+        return excuteHandler(workDir, null, handler, mergeErrorStream, args);
     }
 
-    public <R> Thread excuteHandlerAsync(final File workDir, final File in, final Handler<R> handler, final String... args) throws Exception {
+    public <R> Thread excuteHandlerAsync(final File workDir, final File in, final Handler<R> handler, final boolean mergeErrorStream, final String... args) throws Exception {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    excuteHandler(workDir, in, handler, args);
+                    excuteHandler(workDir, in, handler, mergeErrorStream, args);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -150,8 +161,8 @@ public class Commands {
         return t;
     }
 
-    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, final String... args) throws Exception {
-        return excuteHandlerAsync(workDir, null, handler, args);
+    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, boolean mergeErrorStream, final String... args) throws Exception {
+        return excuteHandlerAsync(workDir, null, handler, mergeErrorStream, args);
     }
 
 

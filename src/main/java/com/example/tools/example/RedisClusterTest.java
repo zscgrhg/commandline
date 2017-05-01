@@ -25,7 +25,7 @@ public class RedisClusterTest {
                 redis_script_file.getCanonicalPath(), "start");
         commands.executeRedirectIO(cluster_home,
                 new File("/root/IdeaProjects/commandline/redis/yes.txt"),
-                null, null,
+                null, null, true,
                 redis_script_file.getCanonicalPath(), "create");
     }
 

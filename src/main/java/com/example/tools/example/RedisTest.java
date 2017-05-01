@@ -41,7 +41,7 @@ public class RedisTest {
                 }
                 File[] toDelete = file.listFiles();
                 for (File f : toDelete) {
-                    if(!f.getName().equalsIgnoreCase("redis.conf")){
+                    if (!f.getName().equalsIgnoreCase("redis.conf")) {
                         f.delete();
                     }
                 }
@@ -49,7 +49,9 @@ public class RedisTest {
 
                 File log = file.toPath().resolve("redis.log").toFile();
                 commands.execute(file, "ls");
-                commands.excuteHandlerAsync(file, new RedisStartHandler(countDownLatch,log), "/home/think/test-redis/redis-3.2.8/src/redis-server", "./redis.conf");
+                commands.excuteHandlerAsync(file,
+                        new RedisStartHandler(countDownLatch, log), true,
+                        "/home/think/test-redis/redis-3.2.8/src/redis-server", "./redis.conf");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -59,7 +61,7 @@ public class RedisTest {
         commands.executeRedirectIO(clusterBasedir.toPath().resolve("7000").toFile(),
                 clusterBasedir.toPath().resolve("yes.txt").toFile(),
                 null,
-                null, "/home/think/test-redis/redis-3.2.8/src/redis-trib.rb",
+                null, true, "/home/think/test-redis/redis-3.2.8/src/redis-trib.rb",
                 "create", "--replicas", "1"
                 , "127.0.0.1:7000"
                 , "127.0.0.1:7001"
