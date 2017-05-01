@@ -39,32 +39,53 @@ public class Commands {
         return pb;
     }
 
-    public int execute(File workDir, String... args) throws Exception {
+    public int execute(File workDir,
+                       String... args) throws Exception {
         return execute(workDir, args);
     }
 
-    public int execute(File workDir, List<String> args) throws Exception {
+    public int execute(File workDir,
+                       List<String> args) throws Exception {
         return executeRedirectIO(workDir, null, null, null, false, args);
     }
 
-    public int execute(File workDir, File out, String... args) throws Exception {
+    public int execute(File workDir,
+                       File out,
+                       String... args) throws Exception {
         return executeRedirectIO(workDir, null, out, null, true, args);
     }
 
 
-    public int executeRedirectIO(File workDir, File in, File out, String... args) throws Exception {
+    public int executeRedirectIO(File workDir,
+                                 File in,
+                                 File out,
+                                 String... args) throws Exception {
         return executeRedirectIO(workDir, in, out, null, true, args);
     }
 
-    public int executeRedirectIO(File workDir, File in, File out, File err, String... args) throws Exception {
+    public int executeRedirectIO(File workDir,
+                                 File in,
+                                 File out,
+                                 File err,
+                                 String... args) throws Exception {
         return executeRedirectIO(workDir, in, out, err, false, args);
     }
 
-    public int executeRedirectIO(File workDir, File in, File out, File err, boolean mergeErrorStream, String... args) throws Exception {
+    public int executeRedirectIO(File workDir,
+                                 File in,
+                                 File out,
+                                 File err,
+                                 boolean mergeErrorStream,
+                                 String... args) throws Exception {
         return executeRedirectIO(workDir, in, out, err, mergeErrorStream, Arrays.asList(args));
     }
 
-    public int executeRedirectIO(File workDir, File in, File out, File err, boolean mergeErrorStream, List<String> args) throws Exception {
+    public int executeRedirectIO(File workDir,
+                                 File in,
+                                 File out,
+                                 File err,
+                                 boolean mergeErrorStream,
+                                 List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         if (workDir != null) {
             pb.directory(workDir);
@@ -101,7 +122,11 @@ public class Commands {
         return process.exitValue();
     }
 
-    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, boolean redirectErrorStream, List<String> args) throws Exception {
+    public <R> R excuteHandler(File workDir,
+                               File in,
+                               Handler<R> handler,
+                               boolean redirectErrorStream,
+                               List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
         pb.redirectErrorStream(redirectErrorStream);
@@ -137,16 +162,27 @@ public class Commands {
         return handler.get();
     }
 
-    public <R> R excuteHandler(File workDir, File in, Handler<R> handler, boolean mergeErrorStream, String... args) throws Exception {
+    public <R> R excuteHandler(File workDir,
+                               File in,
+                               Handler<R> handler,
+                               boolean mergeErrorStream,
+                               String... args) throws Exception {
 
         return excuteHandler(workDir, in, handler, mergeErrorStream, Arrays.asList(args));
     }
 
-    public <R> R excuteHandler(File workDir, boolean mergeErrorStream, Handler<R> handler, String... args) throws Exception {
+    public <R> R excuteHandler(File workDir,
+                               boolean mergeErrorStream,
+                               Handler<R> handler,
+                               String... args) throws Exception {
         return excuteHandler(workDir, null, handler, mergeErrorStream, args);
     }
 
-    public <R> Thread excuteHandlerAsync(final File workDir, final File in, final Handler<R> handler, final boolean mergeErrorStream, final String... args) throws Exception {
+    public <R> Thread excuteHandlerAsync(final File workDir,
+                                         final File in,
+                                         final Handler<R> handler,
+                                         final boolean mergeErrorStream,
+                                         final String... args) throws Exception {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -161,7 +197,10 @@ public class Commands {
         return t;
     }
 
-    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, boolean mergeErrorStream, final String... args) throws Exception {
+    public <R> Thread excuteHandlerAsync(final File workDir,
+                                         final Handler<R> handler,
+                                         boolean mergeErrorStream,
+                                         final String... args) throws Exception {
         return excuteHandlerAsync(workDir, null, handler, mergeErrorStream, args);
     }
 
