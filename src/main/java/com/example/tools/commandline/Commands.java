@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by THINK on 2017/2/4.
  */
-public  class Commands {
+public class Commands {
 
 
     protected Charset charset() {
@@ -25,7 +25,6 @@ public  class Commands {
     protected void waitUntilProcessExit(Process process) throws Exception {
         process.waitFor();
     }
-
 
 
     protected void initProcessBuilder(ProcessBuilder pb) throws IOException {
@@ -45,20 +44,20 @@ public  class Commands {
     }
 
     public int execute(File workDir, List<String> args) throws Exception {
-        return executeAndRedirects(workDir, null, null, null, args);
+        return executeRedirectIO(workDir, null, null, null, args);
     }
 
     public int execute(File workDir, File out, String... args) throws Exception {
-        return executeAndRedirects(workDir, null, out, null, Arrays.asList(args));
+        return executeRedirectIO(workDir, null, out, null, Arrays.asList(args));
     }
 
-    public int executeAndRedirects(File workDir, File in, File out, File err, String... args) throws Exception {
-        return executeAndRedirects(workDir, in, out, err, Arrays.asList(args));
+    public int executeRedirectIO(File workDir, File in, File out, File err, String... args) throws Exception {
+        return executeRedirectIO(workDir, in, out, err, Arrays.asList(args));
     }
 
-    public int executeAndRedirects(File workDir, File in, File out, File err, List<String> args) throws Exception {
+    public int executeRedirectIO(File workDir, File in, File out, File err, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
-        if(workDir!=null){
+        if (workDir != null) {
             pb.directory(workDir);
         }
         initProcessBuilder(pb);
@@ -95,7 +94,7 @@ public  class Commands {
     public <R> R excuteHandler(File workDir, File in, Handler<R> handler, List<String> args) throws Exception {
         ProcessBuilder pb = createProcessBuilder(args);
         initProcessBuilder(pb);
-        if(workDir!=null){
+        if (workDir != null) {
             pb.directory(workDir);
         }
         if (null != null) {
@@ -103,8 +102,8 @@ public  class Commands {
         }
         Process process = pb.start();
         handler.onStart(process);
-        ProcessReader stderrReader=null;
-        if(pb.redirectErrorStream()){
+        ProcessReader stderrReader = null;
+        if (pb.redirectErrorStream()) {
             InputStream errorStream = process.getErrorStream();
             stderrReader =
                     new ProcessReader(false, errorStream, charset(), handler);
@@ -119,7 +118,7 @@ public  class Commands {
         } finally {
             killIfAlive(process);
             stdoutReader.join();
-            if(null!=stderrReader){
+            if (null != stderrReader) {
                 stderrReader.join();
             }
             handler.onComplete(process.exitValue());
@@ -127,21 +126,17 @@ public  class Commands {
         return handler.get();
     }
 
-    public <R> R excuteHandler(File workDir, Handler<R> handler, String... args) throws Exception {
-        return excuteHandler(workDir, null, handler, args);
-    }
-
     public <R> R excuteHandler(File workDir, File in, Handler<R> handler, String... args) throws Exception {
 
         return excuteHandler(workDir, in, handler, Arrays.asList(args));
     }
 
-    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, final String... args) throws Exception {
-        return excuteHandlerAsync(workDir, null, handler, args);
+    public <R> R excuteHandler(File workDir, Handler<R> handler, String... args) throws Exception {
+        return excuteHandler(workDir, null, handler, args);
     }
 
     public <R> Thread excuteHandlerAsync(final File workDir, final File in, final Handler<R> handler, final String... args) throws Exception {
-        Thread t=new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -154,6 +149,11 @@ public  class Commands {
         t.start();
         return t;
     }
+
+    public <R> Thread excuteHandlerAsync(final File workDir, final Handler<R> handler, final String... args) throws Exception {
+        return excuteHandlerAsync(workDir, null, handler, args);
+    }
+
 
     public void killIfAlive(Process process) {
         try {

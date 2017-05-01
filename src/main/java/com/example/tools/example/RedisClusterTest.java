@@ -23,7 +23,7 @@ public class RedisClusterTest {
     public static void startCluster() throws Exception {
         commands.execute(cluster_home,
                 redis_script_file.getCanonicalPath(), "start");
-        commands.executeAndRedirects(cluster_home,
+        commands.executeRedirectIO(cluster_home,
                 new File("/root/IdeaProjects/commandline/redis/yes.txt"),
                 null, null,
                 redis_script_file.getCanonicalPath(), "create");
@@ -31,6 +31,6 @@ public class RedisClusterTest {
 
     public static void main(String[] args) throws Exception {
         stopCluster();
-        startCluster();
+        //startCluster();
     }
 }

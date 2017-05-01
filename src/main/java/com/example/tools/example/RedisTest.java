@@ -14,6 +14,12 @@ import java.util.concurrent.CountDownLatch;
  */
 public class RedisTest {
 
+    public static void stopRedis() throws Exception {
+        final Commands commands = new Commands();
+        File clusterBasedir = new File("/root/IdeaProjects/commandline/redis");
+        commands.execute(clusterBasedir, "/bin/bash", "./shutdown.sh");
+    }
+
     public static void startRedis() throws Exception {
         final Commands commands = new Commands();
         File clusterBasedir = new File("/root/IdeaProjects/commandline/redis");
@@ -50,7 +56,7 @@ public class RedisTest {
         }
 
         countDownLatch.await();
-        commands.executeAndRedirects(clusterBasedir.toPath().resolve("7000").toFile(),
+        commands.executeRedirectIO(clusterBasedir.toPath().resolve("7000").toFile(),
                 clusterBasedir.toPath().resolve("yes.txt").toFile(),
                 null,
                 null, "/home/think/test-redis/redis-3.2.8/src/redis-trib.rb",
@@ -65,7 +71,9 @@ public class RedisTest {
     }
 
     public static void main(String[] args) throws Exception {
-        startRedis();
+
+        stopRedis();
+        //startRedis();
         System.out.println("done");
     }
 }
