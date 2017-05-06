@@ -41,7 +41,8 @@ public class Commands {
 
     public int execute(File workDir,
                        String... args) throws Exception {
-        return execute(workDir, args);
+
+        return executeRedirectIO(workDir, null, null, null, true, args);
     }
 
     public int execute(File workDir,
